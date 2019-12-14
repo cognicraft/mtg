@@ -30,15 +30,7 @@ func (s *Scryfall) LargeImage(name string) ([]byte, error) {
 	if err == nil {
 		return imgRes.Data, nil
 	}
-	sc, err := s.CardNamed(name)
-	if err != nil {
-		return nil, err
-	}
-	large, ok := sc.ImageURIs["large"]
-	if !ok {
-		return nil, fmt.Errorf("not found")
-	}
-	img, err := http.Get(large)
+	img, err := http.Get(s.urlLargeImageByName(name))
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +43,8 @@ func (s *Scryfall) LargeImage(name string) ([]byte, error) {
 	return bs, err
 }
 
-func (s *Scryfall) CardNamed(name string) (ScryfallCard, error) {
-	resp, err := http.Get(s.urlCardNamed(name))
+func (s *Scryfall) Card(name string) (ScryfallCard, error) {
+	resp, err := http.Get(s.urlCardByName(name))
 	if err != nil {
 		return ScryfallCard{}, err
 	}
@@ -66,7 +58,11 @@ func (s *Scryfall) CardNamed(name string) (ScryfallCard, error) {
 	return sc, nil
 }
 
-func (s *Scryfall) urlCardNamed(name string) string {
+func (s *Scryfall) urlLargeImageByName(name string) string {
+	return fmt.Sprintf("%s/cards/named?format=image&version=large&fuzzy=%s", s.baseURL, url.QueryEscape(name))
+}
+
+func (s *Scryfall) urlCardByName(name string) string {
 	return fmt.Sprintf("%s/cards/named?fuzzy=%s", s.baseURL, url.QueryEscape(name))
 }
 
