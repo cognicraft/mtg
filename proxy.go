@@ -24,7 +24,7 @@ func PDF(data *archive.Archive, deck Deck, file string) error {
 	pdf := gofpdf.New("L", "mm", "A4", "")
 
 	pdf.AddPage()
-	addCutHelpersToPage(pdf)
+	addCropMarks(pdf)
 
 	pdf.SetFont("Arial", "", 10)
 	pdf.SetTextColor(255, 255, 255)
@@ -51,13 +51,13 @@ func PDF(data *archive.Archive, deck Deck, file string) error {
 		}
 		if len(deck.Cards)-1 > i && i%8 == 7 {
 			pdf.AddPage()
-			addCutHelpersToPage(pdf)
+			addCropMarks(pdf)
 		}
 	}
 	return pdf.OutputFileAndClose(file)
 }
 
-func addCutHelpersToPage(pdf *gofpdf.Fpdf) {
+func addCropMarks(pdf *gofpdf.Fpdf) {
 	pageWidth, pageHeight := pdf.GetPageSize()
 	for i := 0; i <= 4; i++ {
 		pdf.Line(xOff+float64(i)*cardWidth, 0, xOff+float64(i)*cardWidth, 10)
