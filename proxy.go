@@ -20,7 +20,7 @@ const (
 )
 
 func PDF(data *archive.Archive, deck Deck, file string) error {
-	db := NewScryfall(data)
+	s := NewScryfall(data)
 	pdf := gofpdf.New("L", "mm", "A4", "")
 
 	pdf.AddPage()
@@ -38,7 +38,7 @@ func PDF(data *archive.Archive, deck Deck, file string) error {
 		col := float64(i % 4)
 		row := float64((i % 8) / 4)
 
-		bs, err := db.LargeImage(c.Name)
+		bs, err := s.LargeImage(c.Name)
 		if err != nil {
 			log.Printf("ERROR: %v", err)
 			continue
