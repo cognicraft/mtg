@@ -52,7 +52,9 @@ func (s *Scryfall) Card(name string) (ScryfallCard, error) {
 		return ScryfallCard{}, err
 	}
 	defer resp.Body.Close()
-
+	if resp.StatusCode != http.StatusOK {
+		return ScryfallCard{}, fmt.Errorf("bad status: %s", resp.Status)
+	}
 	sc := ScryfallCard{}
 	err = json.NewDecoder(resp.Body).Decode(&sc)
 	if err != nil {
