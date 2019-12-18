@@ -8,6 +8,21 @@ import (
 )
 
 type Deck struct {
+	Name     string
+	Sections []Section
+}
+
+func (d Deck) Cards() []Card {
+	var cards []Card
+	for _, s := range d.Sections {
+		for _, c := range s.Cards {
+			cards = append(cards, c)
+		}
+	}
+	return cards
+}
+
+type Section struct {
 	Name  string
 	Cards []Card
 }
@@ -18,6 +33,7 @@ type Card struct {
 
 func ParseDeck(in io.Reader) (Deck, error) {
 	deck := Deck{}
+	currentSection := Section{Name: "Main"}
 	scanner := bufio.NewScanner(in)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -38,8 +54,9 @@ func ParseDeck(in io.Reader) (Deck, error) {
 		name := strings.Join(fs[1:], " ")
 		n := int(c)
 		for i := 0; i < n; i++ {
-			deck.Cards = append(deck.Cards, Card{Name: name})
+			currentSection.Cards = append(currentSection.Cards, Card{Name: name})
 		}
 	}
+	deck.Sections = append(deck.Sections, currentSection)
 	return deck, nil
 }

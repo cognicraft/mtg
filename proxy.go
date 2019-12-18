@@ -34,7 +34,8 @@ func PDF(data *archive.Archive, deck Deck, file string) error {
 		AllowNegativePosition: true,
 	}
 
-	for i, c := range deck.Cards {
+	cards := deck.Cards()
+	for i, c := range cards {
 		col := float64(i % 4)
 		row := float64((i % 8) / 4)
 
@@ -49,7 +50,7 @@ func PDF(data *archive.Archive, deck Deck, file string) error {
 			pdf.MoveTo(xOff+labelX+col*cardWidth, yOff+labelY+row*cardHight)
 			pdf.CellFormat(labelWidth, labelHight, deck.Name, "", 0, "CM", true, 0, "")
 		}
-		if len(deck.Cards)-1 > i && i%8 == 7 {
+		if len(cards)-1 > i && i%8 == 7 {
 			pdf.AddPage()
 			addCropMarks(pdf)
 		}
