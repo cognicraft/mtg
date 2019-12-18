@@ -35,6 +35,9 @@ func (s *Scryfall) LargeImage(name string) ([]byte, error) {
 		return nil, err
 	}
 	defer img.Body.Close()
+	if img.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("bad status: %s", img.Status)
+	}
 	bs, err := ioutil.ReadAll(img.Body)
 	if err != nil {
 		return nil, err
