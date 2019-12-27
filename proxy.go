@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"log"
 
-	"github.com/cognicraft/archive"
+	"github.com/cognicraft/mtg/scryfall"
 	"github.com/jung-kurt/gofpdf"
 )
 
@@ -19,10 +19,8 @@ const (
 	labelHight float64 = 5
 )
 
-func PDF(data *archive.Archive, deck Deck, file string) error {
-	s := NewScryfall(data)
+func PDF(client *scryfall.Client, deck Deck, file string) error {
 	pdf := gofpdf.New("L", "mm", "A4", "")
-
 	pdf.AddPage()
 	addCropMarks(pdf)
 
@@ -34,18 +32,39 @@ func PDF(data *archive.Archive, deck Deck, file string) error {
 		AllowNegativePosition: true,
 	}
 
+	var auxImgages []img
+
 	cards := deck.Cards()
-	for i, c := range cards {
+	for i, card := range cards {
 		col := float64(i % 4)
 		row := float64((i % 8) / 4)
 
-		bs, err := s.LargeImage(c.Name)
+		sc := client.Card(card.Name)
+
+		var name string
+		var data []byte
+		var err error
+
+		switch sc.Layout {
+		case scryfall.LayoutTransform:
+			f := sc.Front()
+			name = f.Name
+			data, err = f.Image("large")
+
+			b := sc.Back()
+			if data, err := b.Image("large"); err == nil {
+				auxImgages = append(auxImgages, img{name: b.Name, data: data})
+			}
+		default:
+			name = sc.Name
+			data, err = sc.Image("large")
+		}
 		if err != nil {
 			log.Printf("ERROR: %v", err)
 			continue
 		}
-		pdf.RegisterImageOptionsReader(c.Name, opt, bytes.NewBuffer(bs))
-		pdf.ImageOptions(c.Name, xOff+col*cardWidth, yOff+row*cardHight, cardWidth, cardHight, false, opt, 0, "")
+		pdf.RegisterImageOptionsReader(name, opt, bytes.NewBuffer(data))
+		pdf.ImageOptions(name, xOff+col*cardWidth, yOff+row*cardHight, cardWidth, cardHight, false, opt, 0, "")
 		if deck.Name != "" {
 			pdf.MoveTo(xOff+labelX+col*cardWidth, yOff+labelY+row*cardHight)
 			pdf.CellFormat(labelWidth, labelHight, deck.Name, "", 0, "CM", true, 0, "")
@@ -55,6 +74,27 @@ func PDF(data *archive.Archive, deck Deck, file string) error {
 			addCropMarks(pdf)
 		}
 	}
+
+	if len(auxImgages) > 0 {
+		pdf.AddPage()
+		addCropMarks(pdf)
+		for i, img := range auxImgages {
+			col := float64(i % 4)
+			row := float64((i % 8) / 4)
+
+			pdf.RegisterImageOptionsReader(img.name, opt, bytes.NewBuffer(img.data))
+			pdf.ImageOptions(img.name, xOff+col*cardWidth, yOff+row*cardHight, cardWidth, cardHight, false, opt, 0, "")
+			if deck.Name != "" {
+				pdf.MoveTo(xOff+labelX+col*cardWidth, yOff+labelY+row*cardHight)
+				pdf.CellFormat(labelWidth, labelHight, deck.Name, "", 0, "CM", true, 0, "")
+			}
+			if len(cards)-1 > i && i%8 == 7 {
+				pdf.AddPage()
+				addCropMarks(pdf)
+			}
+		}
+	}
+
 	return pdf.OutputFileAndClose(file)
 }
 
@@ -68,4 +108,9 @@ func addCropMarks(pdf *gofpdf.Fpdf) {
 		pdf.Line(0, yOff+float64(i)*cardHight, 10, yOff+float64(i)*cardHight)
 		pdf.Line(pageWidth-10, yOff+float64(i)*cardHight, pageWidth, yOff+float64(i)*cardHight)
 	}
+}
+
+type img struct {
+	name string
+	data []byte
 }

@@ -9,13 +9,14 @@ import (
 
 	"github.com/cognicraft/archive"
 	"github.com/cognicraft/mtg"
+	"github.com/cognicraft/mtg/scryfall"
 )
 
 var version = "0.1"
 
 func main() {
-	name := flag.String("name", "", "Name")
-	d := flag.String("data", "data.arc", "Data Archive")
+	n := flag.String("name", "", "Name")
+	c := flag.String("cache", "cache.arc", "Cache")
 	v := flag.Bool("version", false, "Version")
 	flag.Parse()
 
@@ -28,11 +29,11 @@ func main() {
 		log.Fatal(fmt.Errorf("no deck specified"))
 	}
 
-	data, err := archive.Open(*d)
+	cache, err := archive.Open(*c)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer data.Close()
+	defer cache.Close()
 
 	deckFileName := flag.Arg(0)
 	deckFile, err := os.Open(deckFileName)
@@ -45,12 +46,20 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	deck.Name = *name
+	deck.Name = *n
 
 	ext := filepath.Ext(deckFileName)
 	proxyFileName := deckFileName[0:len(deckFileName)-len(ext)] + ".pdf"
 
-	err = mtg.PDF(data, deck, proxyFileName)
+	scry, err := scryfall.New(
+		scryfall.Cache(cache),
+		scryfall.Debug,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = mtg.PDF(scry, deck, proxyFileName)
 	if err != nil {
 		log.Fatal(err)
 	}

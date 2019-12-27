@@ -28,7 +28,13 @@ type Section struct {
 }
 
 type Card struct {
-	Name string
+	Name    string
+	Version *Version
+}
+
+type Version struct {
+	Set             string
+	CollectorNumber string
 }
 
 func ParseDeck(in io.Reader) (Deck, error) {
@@ -36,12 +42,30 @@ func ParseDeck(in io.Reader) (Deck, error) {
 	currentSection := Section{Name: "Main"}
 	scanner := bufio.NewScanner(in)
 	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
+		line := scanner.Text()
+		if strings.HasPrefix(line, "//") {
+			continue
+		}
+		if i := strings.Index(line, "#"); i >= 0 {
+			line = line[:i]
+		}
+		line = strings.TrimSpace(line)
 		if line == "" {
 			continue
 		}
-		if strings.HasPrefix(line, "//") {
-			continue
+		card := Card{}
+		if i := strings.Index(line, "["); i >= 0 {
+			if o := strings.Index(line, "]"); o > 0 {
+				version := line[i+1 : o]
+				vps := strings.Split(version, ":")
+				switch len(vps) {
+				case 1:
+					card.Version = &Version{Set: vps[0]}
+				case 2:
+					card.Version = &Version{Set: vps[0], CollectorNumber: vps[1]}
+				}
+				line = line[:i] + line[o+1:]
+			}
 		}
 		fs := strings.Fields(line)
 		if len(fs) < 2 {
@@ -51,10 +75,10 @@ func ParseDeck(in io.Reader) (Deck, error) {
 		if err != nil {
 			continue
 		}
-		name := strings.Join(fs[1:], " ")
+		card.Name = strings.Join(fs[1:], " ")
 		n := int(c)
 		for i := 0; i < n; i++ {
-			currentSection.Cards = append(currentSection.Cards, Card{Name: name})
+			currentSection.Cards = append(currentSection.Cards, card)
 		}
 	}
 	deck.Sections = append(deck.Sections, currentSection)
