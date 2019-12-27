@@ -55,7 +55,7 @@ func ParseDeck(in io.Reader) (Deck, error) {
 		}
 		card := Card{}
 		if i := strings.Index(line, "["); i >= 0 {
-			if o := strings.Index(line, "]"); o > 0 {
+			if o := strings.Index(line, "]"); o > i {
 				version := line[i+1 : o]
 				vps := strings.Split(version, ":")
 				switch len(vps) {
