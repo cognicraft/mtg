@@ -96,7 +96,7 @@ type Card struct {
 	LifeModifier string `json:"life_modifier,omitempty"`
 
 	// This loyalty if any. Note that some cards have loyalties that are not numeric, such as X.
-	Loyality string `json:"loyality,omitempty"`
+	Loyalty string `json:"loyalty,omitempty"`
 
 	// The mana cost for this card. This value will be any empty string "" if the cost is absent.
 	// Remember that per the game rules, a missing mana cost and a mana cost of {0} are different values.

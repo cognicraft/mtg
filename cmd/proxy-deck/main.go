@@ -17,6 +17,7 @@ var version = "0.1"
 func main() {
 	n := flag.String("name", "", "Name")
 	c := flag.String("cache", "cache.arc", "Cache")
+	f := flag.String("format", "image", "Format")
 	v := flag.Bool("version", false, "Version")
 	flag.Parse()
 
@@ -59,7 +60,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = mtg.PDF(scry, deck, proxyFileName)
+	switch *f {
+	case "text":
+		err = mtg.SimplePDF(scry, deck, proxyFileName)
+	default:
+		err = mtg.PDF(scry, deck, proxyFileName)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
