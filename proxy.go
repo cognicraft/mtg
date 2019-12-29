@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"strings"
 
 	"github.com/cognicraft/mtg/scryfall"
 	"github.com/jung-kurt/gofpdf"
@@ -30,7 +29,6 @@ func SimplePDF(client *scryfall.Client, deck Deck, file string) error {
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFillColor(255, 255, 255)
 
-	rep := strings.NewReplacer("−", "-")
 	tr := pdf.UnicodeTranslatorFromDescriptor("")
 
 	var aux []string
@@ -79,16 +77,12 @@ func SimplePDF(client *scryfall.Client, deck Deck, file string) error {
 		pdf.Line(x+2, y+2+6+imgHeight+6, x+cardWidth-2, y+2+6+imgHeight+6)
 
 		pdf.MoveTo(x+2, y+2+6+imgHeight+6+1)
-		pdf.MultiCell(cardWidth-2*2, 3.8, tr(rep.Replace(sc.OracleText)), "", "LT", false)
+		pdf.MultiCell(cardWidth-2*2, 3.8, tr(sc.OracleText), "", "LT", false)
 
 		pdf.Line(x+2, y+cardHeight-6-2, x+cardWidth-2, y+cardHeight-6-2)
 		if sc.Power != "" && sc.Toughness != "" {
 			pdf.MoveTo(x+cardWidth-15, y+cardHeight-6-2-2)
 			pdf.CellFormat(10, 5, fmt.Sprintf("%s / %s", sc.Power, sc.Toughness), "1", 0, "CM", true, 0, "")
-		}
-		if sc.Loyalty != "" {
-			pdf.MoveTo(x+cardWidth-15, y+cardHeight-6-2-2)
-			pdf.CellFormat(10, 5, sc.Loyalty, "1", 0, "CM", true, 0, "")
 		}
 
 		if deck.Name != "" {
@@ -152,15 +146,15 @@ func PDF(client *scryfall.Client, deck Deck, file string) error {
 		case scryfall.LayoutTransform:
 			f := sc.Front()
 			name = f.Name
-			data, err = f.Image("large")
+			data, err = client.Image(f.ImageURIs["large"])
 
 			b := sc.Back()
-			if data, err := b.Image("large"); err == nil {
+			if data, err := client.Image(b.ImageURIs["large"]); err == nil {
 				auxImgages = append(auxImgages, img{name: b.Name, data: data})
 			}
 		default:
 			name = sc.Name
-			data, err = sc.Image("large")
+			data, err = client.Image(sc.ImageURIs["large"])
 		}
 		if err != nil {
 			log.Printf("ERROR: %v", err)

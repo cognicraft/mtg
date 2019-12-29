@@ -16,7 +16,7 @@ func TestCard(t *testing.T) {
 	if !c.IsLegalIn("pioneer") {
 		t.Errorf("expected Plains to be legal in Pioneer")
 	}
-	c.Image("large")
+	s.Image(c.ImageURIs["large"])
 
 	// t.Fail()
 }
@@ -25,5 +25,4 @@ func TestNicol(t *testing.T) {
 	c, _ := New(Debug)
 	card := c.Card("Nicol Bolas, the Ravager")
 	t.Logf("%v", card.Front())
-	t.Fail()
 }

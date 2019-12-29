@@ -1,16 +1,8 @@
 package scryfall
 
-import (
-	"fmt"
-
-	"github.com/cognicraft/archive"
-)
-
 // Card objects represent individual Magic: The Gathering cards that players
 // could obtain and add to their collection (with a few minor exceptions).
 type Card struct {
-	client *Client
-
 	// This card’s Arena ID, if any.
 	// A large percentage of cards are not available on Arena and do not have this ID.
 	ArenaID int `json:"arena_id,omitempty"`
@@ -96,7 +88,7 @@ type Card struct {
 	LifeModifier string `json:"life_modifier,omitempty"`
 
 	// This loyalty if any. Note that some cards have loyalties that are not numeric, such as X.
-	Loyalty string `json:"loyalty,omitempty"`
+	Loyality string `json:"loyality,omitempty"`
 
 	// The mana cost for this card. This value will be any empty string "" if the cost is absent.
 	// Remember that per the game rules, a missing mana cost and a mana cost of {0} are different values.
@@ -240,42 +232,9 @@ type Card struct {
 	Preview *Preview `json:"preview,omitempty"`
 }
 
-func (c *Card) Printings() *List {
-	l := List{}
-	err := c.client.doGetJSON(c.PrintsSearchURI, &l)
-	if err != nil {
-		c.client.logf("%v", err)
-		return nil
-	}
-	l.client = c.client
-	return &l
-}
-
-func (c *Card) Image(version string) ([]byte, error) {
-	c.client.logf("[DEBUG] Card.Image(%q)", version)
-	url, ok := c.ImageURIs[version]
-	if !ok {
-		return nil, fmt.Errorf("unknown version")
-	}
-	img, err := c.client.cache.Load(url)
-	if err == nil {
-		c.client.logf("[DEBUG]   retrieved from cache")
-		return img.Data, nil
-	}
-	data, err := c.client.doGetBytes(url)
-	if err != nil {
-		c.client.logf("[ERROR]   %v", err)
-		return nil, err
-	}
-	c.client.cache.Store(archive.JPEG(url, data))
-	c.client.logf("[DEBUG]   retrieved from scryfall")
-	return data, nil
-}
-
 func (c *Card) Front() *CardFace {
 	if len(c.CardFaces) > 0 {
 		cf := c.CardFaces[0]
-		cf.client = c.client
 		return cf
 	}
 	return nil
@@ -284,7 +243,6 @@ func (c *Card) Front() *CardFace {
 func (c *Card) Back() *CardFace {
 	if len(c.CardFaces) > 1 {
 		cf := c.CardFaces[1]
-		cf.client = c.client
 		return cf
 	}
 	return nil
@@ -298,8 +256,6 @@ func (c *Card) IsLegalIn(format string) bool {
 }
 
 type CardFace struct {
-	client *Client
-
 	// The name of the illustrator of this card face. Newly spoiled cards may not have this field yet.
 	Artist string `json:"artist,omitempty"`
 
@@ -364,32 +320,9 @@ type CardFace struct {
 	Watermark string `json:"watermark,omitempty"`
 }
 
-func (cf *CardFace) Image(version string) ([]byte, error) {
-	cf.client.logf("[DEBUG] CardFace.Image(%q)", version)
-	url, ok := cf.ImageURIs[version]
-	if !ok {
-		return nil, fmt.Errorf("unknown version")
-	}
-	img, err := cf.client.cache.Load(url)
-	if err == nil {
-		cf.client.logf("[DEBUG]   retrieved from cache")
-		return img.Data, nil
-	}
-	data, err := cf.client.doGetBytes(url)
-	if err != nil {
-		cf.client.logf("[ERROR]   %v", err)
-		return nil, err
-	}
-	cf.client.cache.Store(archive.JPEG(url, data))
-	cf.client.logf("[DEBUG]   retrieved from scryfall")
-	return data, nil
-}
-
 // Cards that are closely related to other cards (because they call them by name, or generate a token, or meld, etc)
 // have a all_parts property that contains Related Card objects.
 type RelatedCard struct {
-	client *Client
-
 	// An unique ID for this card in Scryfall’s database.
 	ID string `json:"id"`
 

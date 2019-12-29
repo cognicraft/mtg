@@ -7,8 +7,6 @@ import (
 // A List object represents a requested sequence of other objects (Cards, Sets, etc).
 // List objects may be paginated, and also include information about issues raised when generating the list.
 type List struct {
-	client *Client
-
 	Object string `json:"object"`
 
 	// An array of the requested objects, in a specific order.
@@ -36,23 +34,7 @@ func (l *List) Cards() []*Card {
 	for _, d := range l.Data {
 		c := Card{}
 		json.Unmarshal(d, &c)
-		c.client = l.client
 		cards = append(cards, &c)
 	}
 	return cards
-}
-
-func (l *List) Next() *List {
-	if !l.HasMore {
-		l.client.logf("no more entries")
-		return nil
-	}
-	n := List{}
-	err := l.client.doGetJSON(l.NextPage, &n)
-	if err != nil {
-		l.client.logf("%v", err)
-		return nil
-	}
-	n.client = l.client
-	return &n
 }

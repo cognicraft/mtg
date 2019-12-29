@@ -77,7 +77,6 @@ func (c *Client) Card(name string) *Card {
 
 	card := Card{}
 	if err := archive.LoadJSON(c.cache, url, &card); err == nil {
-		card.client = c
 		c.logf("[DEBUG]   retrieved from cache")
 		return &card
 	}
@@ -87,10 +86,26 @@ func (c *Client) Card(name string) *Card {
 		c.logf("[ERROR]   %v", err)
 		return nil
 	}
-	card.client = c
 	c.cache.Store(archive.GenericJSON(url, card))
 	c.logf("[DEBUG]   retrieved from scryfall")
 	return &card
+}
+
+func (s *Client) Image(url string) ([]byte, error) {
+	s.logf("[DEBUG] Image(%q)", url)
+	img, err := s.cache.Load(url)
+	if err == nil {
+		s.logf("[DEBUG]   retrieved from cache")
+		return img.Data, nil
+	}
+	data, err := s.doGetBytes(url)
+	if err != nil {
+		s.logf("[ERROR]   %v", err)
+		return nil, err
+	}
+	s.cache.Store(archive.JPEG(url, data))
+	s.logf("[DEBUG]   retrieved from scryfall")
+	return data, nil
 }
 
 func (c *Client) doGetJSON(url string, v interface{}) error {
