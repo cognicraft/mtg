@@ -70,7 +70,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
-func (c *Client) Card(name string) *Card {
+func (c *Client) CardByName(name string) *Card {
 	c.logf("[DEBUG] Card(%q)", name)
 
 	url := c.urlCardByName(name)
@@ -91,7 +91,24 @@ func (c *Client) Card(name string) *Card {
 	return &card
 }
 
-func (s *Client) Image(url string) ([]byte, error) {
+func (c *Client) CardByURL(url string) *Card {
+	card := Card{}
+	if err := archive.LoadJSON(c.cache, url, &card); err == nil {
+		c.logf("[DEBUG]   retrieved from cache")
+		return &card
+	}
+
+	err := c.doGetJSON(url, &card)
+	if err != nil {
+		c.logf("[ERROR]   %v", err)
+		return nil
+	}
+	c.cache.Store(archive.GenericJSON(url, card))
+	c.logf("[DEBUG]   retrieved from scryfall")
+	return &card
+}
+
+func (s *Client) ImageByURL(url string) ([]byte, error) {
 	s.logf("[DEBUG] Image(%q)", url)
 	img, err := s.cache.Load(url)
 	if err == nil {

@@ -62,9 +62,9 @@ func main() {
 
 	switch *f {
 	case "text":
-		err = mtg.SimplePDF(scry, deck, proxyFileName)
+		err = mtg.NewProxyPrinter(scry, deck).WriteTextProxies(proxyFileName)
 	default:
-		err = mtg.PDF(scry, deck, proxyFileName)
+		err = mtg.NewProxyPrinter(scry, deck).WriteImageProxies(proxyFileName)
 	}
 	if err != nil {
 		log.Fatal(err)
