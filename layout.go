@@ -9,16 +9,22 @@ import (
 	"github.com/jung-kurt/gofpdf"
 )
 
-func LayoutFolder(inDir string, outFile string) error {
-	deckName := ""
+func LayoutDirectory(deckName string, playset bool, inDir string, outFile string) error {
 	pdf := gofpdf.New("L", "mm", "A4", "")
 
 	pdf.SetFont("Arial", "", 10)
 	pdf.SetTextColor(255, 255, 255)
 
-	opt := gofpdf.ImageOptions{
-		ImageType:             "jpg",
-		AllowNegativePosition: true,
+	optFor := func(fileName string) gofpdf.ImageOptions {
+		ext := filepath.Ext(fileName)
+		switch ext {
+		case ".jpg", ".jpeg", ".png", ".gif":
+			return gofpdf.ImageOptions{
+				ImageType:             ext[1:],
+				AllowNegativePosition: true,
+			}
+		}
+		return gofpdf.ImageOptions{}
 	}
 
 	writeSection := func(cards []Card) {
@@ -32,6 +38,7 @@ func LayoutFolder(inDir string, outFile string) error {
 			col := float64(i % 4)
 			row := float64((i % 8) / 4)
 
+			opt := optFor(card.Name)
 			pdf.RegisterImageOptionsReader(card.Name, opt, bytes.NewBuffer(card.ImageData))
 			pdf.ImageOptions(card.Name, xOff+col*cardWidth, yOff+row*cardHeight, cardWidth, cardHeight, false, opt, 0, "")
 			if deckName != "" {
@@ -45,9 +52,7 @@ func LayoutFolder(inDir string, outFile string) error {
 		}
 	}
 
-	deck := Deck{}
 	var main Section
-
 	files, err := ioutil.ReadDir(inDir)
 	if err != nil {
 		return err
@@ -55,18 +60,23 @@ func LayoutFolder(inDir string, outFile string) error {
 	for _, file := range files {
 		ext := filepath.Ext(file.Name())
 		switch ext {
-		case ".jpg":
+		case ".jpg", ".jpeg", ".png", ".gif":
 			c := Card{Name: file.Name()}
-			if data, err := ioutil.ReadFile(file.Name()); err != nil {
+			if data, err := ioutil.ReadFile(filepath.Join(inDir, file.Name())); err == nil {
 				c.ImageData = data
+			} else {
+				fmt.Printf("ERROR: %v\n", err)
 			}
 			main.Cards = append(main.Cards, c)
+			if playset {
+				main.Cards = append(main.Cards, c)
+				main.Cards = append(main.Cards, c)
+				main.Cards = append(main.Cards, c)
+			}
 		}
-		fmt.Println(file.Name())
 	}
-
-	for _, s := range deck.Sections {
-		writeSection(s.Cards)
+	if len(main.Cards) > 0 {
+		writeSection(main.Cards)
 	}
 
 	return pdf.OutputFileAndClose(outFile)
