@@ -24,12 +24,36 @@ func (d Deck) Cards() []Card {
 
 type Section struct {
 	Name  string
-	Cards []Card
+	Cards Cards
+}
+
+type Cards []Card
+
+func (cs Cards) Contains(accept func(Card) bool) bool {
+	for _, c := range cs {
+		if accept(c) {
+			return true
+		}
+	}
+	return false
+}
+
+func CardByName(name string) func(Card) bool {
+	return func(c Card) bool {
+		return c.Name == name
+	}
 }
 
 type Card struct {
-	Name    string
-	Version *Version
+	Name       string
+	ManaCost   string
+	TypeLine   string
+	OracleText string
+	Power      string
+	Toughness  string
+	Loyalty    string
+	ImageData  []byte
+	Version    *Version
 }
 
 type Version struct {

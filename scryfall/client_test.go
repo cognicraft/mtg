@@ -5,7 +5,7 @@ import (
 )
 
 func TestCard(t *testing.T) {
-	s, err := New(Debug)
+	s, err := New(Debug())
 	if err != nil {
 		t.Error(err)
 	}
@@ -22,7 +22,7 @@ func TestCard(t *testing.T) {
 }
 
 func TestNicol(t *testing.T) {
-	c, _ := New(Debug)
+	c, _ := New(Debug())
 	card := c.CardByName("Nicol Bolas, the Ravager")
 	t.Logf("%v", card.Front())
 }

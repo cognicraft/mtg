@@ -14,7 +14,9 @@ import (
 /* https://scryfall.com/docs/api/cards/named */
 /* /cards/:code/:number(/:lang)*/
 
-func New(opts ...func(*Client) error) (*Client, error) {
+type ClientOption func(*Client) error
+
+func New(opts ...ClientOption) (*Client, error) {
 	c := &Client{
 		baseURL:    "https://api.scryfall.com",
 		lang:       LangEnglish,
@@ -39,25 +41,27 @@ func New(opts ...func(*Client) error) (*Client, error) {
 	return c, nil
 }
 
-func Cache(cache *archive.Archive) func(*Client) error {
-	return func(s *Client) error {
-		s.cache = cache
+func Cache(cache *archive.Archive) ClientOption {
+	return func(c *Client) error {
+		c.cache = cache
 		return nil
 	}
 }
 
-func Language(l Lang) func(*Client) error {
-	return func(s *Client) error {
-		s.lang = l
+func Language(l Lang) ClientOption {
+	return func(c *Client) error {
+		c.lang = l
 		return nil
 	}
 }
 
-func Debug(c *Client) error {
-	c.logf = func(format string, args ...interface{}) {
-		fmt.Printf(format+"\n", args...)
+func Debug() ClientOption {
+	return func(c *Client) error {
+		c.logf = func(format string, args ...interface{}) {
+			fmt.Printf(format+"\n", args...)
+		}
+		return nil
 	}
-	return nil
 }
 
 type Client struct {

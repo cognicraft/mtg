@@ -18,6 +18,10 @@ func main() {
 	n := flag.String("name", "", "Name")
 	c := flag.String("cache", "cache.arc", "Cache")
 	f := flag.String("format", "image", "Format")
+	withTokens := flag.Bool("with-tokens", false, "With tokens?")
+	onlyTokens := flag.Bool("only-tokens", false, "Print only associated tokens")
+	numberOfTokens := flag.Int("number-of-tokens", 4, "The number of each token to print.")
+	debug := flag.Bool("debug", false, "Debug?")
 	v := flag.Bool("version", false, "Version")
 	flag.Parse()
 
@@ -52,19 +56,31 @@ func main() {
 	ext := filepath.Ext(deckFileName)
 	proxyFileName := deckFileName[0:len(deckFileName)-len(ext)] + ".pdf"
 
-	scry, err := scryfall.New(
-		scryfall.Cache(cache),
-		scryfall.Debug,
-	)
+	var scOpts []scryfall.ClientOption
+	scOpts = append(scOpts, scryfall.Cache(cache))
+	if *debug {
+		scOpts = append(scOpts, scryfall.Debug())
+	}
+
+	scry, err := scryfall.New(scOpts...)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	var opts []mtg.PrinterOption
+	opts = append(opts, mtg.NumberOfTokens(*numberOfTokens))
+	if *withTokens {
+		opts = append(opts, mtg.PrintTokens())
+	}
+	if *onlyTokens {
+		opts = append(opts, mtg.PrintOnlyTokens())
+	}
+
 	switch *f {
 	case "text":
-		err = mtg.NewProxyPrinter(scry, deck).WriteTextProxies(proxyFileName)
+		err = mtg.NewProxyPrinter(scry, deck, opts...).WriteTextProxies(proxyFileName)
 	default:
-		err = mtg.NewProxyPrinter(scry, deck).WriteImageProxies(proxyFileName)
+		err = mtg.NewProxyPrinter(scry, deck, opts...).WriteImageProxies(proxyFileName)
 	}
 	if err != nil {
 		log.Fatal(err)

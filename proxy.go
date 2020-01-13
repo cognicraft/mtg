@@ -20,13 +20,53 @@ const (
 	labelHight float64 = 5
 )
 
-func NewProxyPrinter(client *scryfall.Client, deck Deck) *ProxyPrinter {
-	return &ProxyPrinter{client: client, deck: deck}
+type PrinterOption func(*ProxyPrinter) error
+
+func PrintTokens() PrinterOption {
+	return func(p *ProxyPrinter) error {
+		p.printTokens = true
+		return nil
+	}
+}
+
+func PrintOnlyTokens() PrinterOption {
+	return func(p *ProxyPrinter) error {
+		p.printFrontFaces = false
+		p.printBackFaces = false
+		p.printTokens = true
+		return nil
+	}
+}
+
+func NumberOfTokens(n int) PrinterOption {
+	return func(p *ProxyPrinter) error {
+		p.numberOfTokens = n
+		return nil
+	}
+}
+
+func NewProxyPrinter(client *scryfall.Client, deck Deck, opts ...PrinterOption) *ProxyPrinter {
+	p := &ProxyPrinter{
+		client:          client,
+		deck:            deck,
+		printFrontFaces: true,
+		printBackFaces:  true,
+		printTokens:     false,
+		numberOfTokens:  4,
+	}
+	for _, opt := range opts {
+		opt(p)
+	}
+	return p
 }
 
 type ProxyPrinter struct {
-	client *scryfall.Client
-	deck   Deck
+	client          *scryfall.Client
+	deck            Deck
+	printFrontFaces bool
+	printBackFaces  bool
+	printTokens     bool
+	numberOfTokens  int
 }
 
 func (p *ProxyPrinter) WriteImageProxies(file string) error {
@@ -40,7 +80,7 @@ func (p *ProxyPrinter) WriteImageProxies(file string) error {
 		AllowNegativePosition: true,
 	}
 
-	writeSection := func(cards []card) {
+	writeSection := func(cards []Card) {
 		if len(cards) == 0 {
 			// empty section
 			return
@@ -64,10 +104,12 @@ func (p *ProxyPrinter) WriteImageProxies(file string) error {
 		}
 	}
 
-	deck := p.collectDeck()
-	writeSection(deck.frontCards)
-	writeSection(deck.backCards)
-	writeSection(deck.tokens)
+	deck := p.collectProxyDeck()
+	for _, s := range deck.Sections {
+		if p.printSection(s.Name) {
+			writeSection(s.Cards)
+		}
+	}
 
 	return pdf.OutputFileAndClose(file)
 }
@@ -82,7 +124,7 @@ func (p *ProxyPrinter) WriteTextProxies(file string) error {
 	rep := strings.NewReplacer("−", "-")
 	tr := pdf.UnicodeTranslatorFromDescriptor("")
 
-	writeSection := func(cards []card) {
+	writeSection := func(cards []Card) {
 		pdf.AddPage()
 		addCropMarks(pdf)
 		for i, card := range cards {
@@ -135,17 +177,43 @@ func (p *ProxyPrinter) WriteTextProxies(file string) error {
 		}
 	}
 
-	deck := p.collectDeck()
-	writeSection(deck.frontCards)
-	writeSection(deck.backCards)
-	writeSection(deck.tokens)
+	deck := p.collectProxyDeck()
+	for _, s := range deck.Sections {
+		if p.printSection(s.Name) {
+			writeSection(s.Cards)
+		}
+	}
 
 	return pdf.OutputFileAndClose(file)
 }
 
-func (p *ProxyPrinter) collectDeck() deck {
-	cardFromCard := func(sc *scryfall.Card) card {
-		c := card{
+func (p *ProxyPrinter) collectProxyDeck() Deck {
+	versionFromCard := func(sc *scryfall.Card) *Version {
+		if sc.Set != "" && sc.CollectorNumber != "" {
+			return &Version{Set: sc.Set, CollectorNumber: sc.CollectorNumber}
+		}
+		return nil
+	}
+
+	cardFromCard := func(sc *scryfall.Card) Card {
+		c := Card{
+			Name:       sc.Name,
+			ManaCost:   sc.ManaCost,
+			TypeLine:   sc.TypeLine,
+			OracleText: sc.OracleText,
+			Power:      sc.Power,
+			Toughness:  sc.Toughness,
+			Loyalty:    sc.Loyalty,
+			Version:    versionFromCard(sc),
+		}
+		if data, err := p.client.ImageByURL(sc.ImageURIs["large"]); err == nil {
+			c.ImageData = data
+		}
+		return c
+	}
+
+	cardFromFace := func(sc *scryfall.CardFace) Card {
+		c := Card{
 			Name:       sc.Name,
 			ManaCost:   sc.ManaCost,
 			TypeLine:   sc.TypeLine,
@@ -160,26 +228,13 @@ func (p *ProxyPrinter) collectDeck() deck {
 		return c
 	}
 
-	cardFromFace := func(sc *scryfall.CardFace) card {
-		c := card{
-			Name:       sc.Name,
-			ManaCost:   sc.ManaCost,
-			TypeLine:   sc.TypeLine,
-			OracleText: sc.OracleText,
-			Power:      sc.Power,
-			Toughness:  sc.Toughness,
-			Loyalty:    sc.Loyalty,
-		}
-		if data, err := p.client.ImageByURL(sc.ImageURIs["large"]); err == nil {
-			c.ImageData = data
-		}
-		return c
-	}
-	d := deck{}
+	d := Deck{}
+	frontFaces := Section{Name: FrontFaces}
+	backFaces := Section{Name: BackFaces}
+	tokens := Section{Name: Tokens}
 
 	cards := p.deck.Cards()
 	for _, card := range cards {
-
 		sc := p.client.CardByName(card.Name)
 		if sc == nil {
 			continue
@@ -187,40 +242,53 @@ func (p *ProxyPrinter) collectDeck() deck {
 
 		switch sc.Layout {
 		case scryfall.LayoutTransform:
-			d.frontCards = append(d.frontCards, cardFromFace(sc.Front()))
-			d.backCards = append(d.backCards, cardFromFace(sc.Back()))
+			ff := cardFromFace(sc.Front())
+			ff.Version = versionFromCard(sc)
+			frontFaces.Cards = append(frontFaces.Cards, ff)
+			bf := cardFromFace(sc.Back())
+			bf.Version = versionFromCard(sc)
+			backFaces.Cards = append(backFaces.Cards, bf)
 		default:
-			d.frontCards = append(d.frontCards, cardFromCard(sc))
+			frontFaces.Cards = append(frontFaces.Cards, cardFromCard(sc))
 		}
 
 		if len(sc.AllParts) > 0 {
 			for _, part := range sc.AllParts {
 				if part.Component == "token" {
 					if tc := p.client.CardByURL(part.URI); tc != nil {
-						d.tokens = append(d.tokens, cardFromCard(tc))
+						t := cardFromCard(tc)
+						if !tokens.Cards.Contains(CardByName(t.Name)) {
+							for i := 0; i < p.numberOfTokens; i++ {
+								tokens.Cards = append(tokens.Cards, t)
+							}
+						}
 					}
 				}
 			}
 		}
 	}
+	if len(frontFaces.Cards) > 0 {
+		d.Sections = append(d.Sections, frontFaces)
+	}
+	if len(backFaces.Cards) > 0 {
+		d.Sections = append(d.Sections, backFaces)
+	}
+	if len(tokens.Cards) > 0 {
+		d.Sections = append(d.Sections, tokens)
+	}
 	return d
 }
 
-type deck struct {
-	frontCards []card
-	backCards  []card
-	tokens     []card
-}
-
-type card struct {
-	Name       string
-	ManaCost   string
-	TypeLine   string
-	OracleText string
-	Power      string
-	Toughness  string
-	Loyalty    string
-	ImageData  []byte
+func (p *ProxyPrinter) printSection(name string) bool {
+	switch name {
+	case FrontFaces:
+		return p.printFrontFaces
+	case BackFaces:
+		return p.printBackFaces
+	case Tokens:
+		return p.printTokens
+	}
+	return true
 }
 
 func addCropMarks(pdf *gofpdf.Fpdf) {
@@ -234,3 +302,9 @@ func addCropMarks(pdf *gofpdf.Fpdf) {
 		pdf.Line(pageWidth-10, yOff+float64(i)*cardHeight, pageWidth, yOff+float64(i)*cardHeight)
 	}
 }
+
+const (
+	FrontFaces = "FrontFaces"
+	BackFaces  = "BackFaces"
+	Tokens     = "Tokens"
+)
