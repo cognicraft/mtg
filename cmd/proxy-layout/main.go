@@ -15,6 +15,7 @@ var version = "0.1"
 func main() {
 	n := flag.String("name", "", "Name")
 	playset := flag.Bool("playset", false, "Playset?")
+	no := flag.Int("copies", 1, "Number of copies per card.")
 	v := flag.Bool("version", false, "Version")
 	flag.Parse()
 
@@ -33,7 +34,15 @@ func main() {
 		outFileName = dirName[:len(dirName)-1] + ".pdf"
 	}
 
-	err := mtg.LayoutDirectory(*n, *playset, dirName, outFileName)
+	numberOfCopies := 1
+	if *playset {
+		numberOfCopies = 4
+	}
+	if *no > numberOfCopies {
+		numberOfCopies = *no
+	}
+
+	err := mtg.LayoutDirectory(*n, numberOfCopies, dirName, outFileName)
 	if err != nil {
 		log.Fatal(err)
 	}

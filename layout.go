@@ -9,7 +9,7 @@ import (
 	"github.com/jung-kurt/gofpdf"
 )
 
-func LayoutDirectory(deckName string, playset bool, inDir string, outFile string) error {
+func LayoutDirectory(deckName string, numberOfCopiesPerCard int, inDir string, outFile string) error {
 	pdf := gofpdf.New("L", "mm", "A4", "")
 
 	pdf.SetFont("Arial", "", 10)
@@ -67,10 +67,7 @@ func LayoutDirectory(deckName string, playset bool, inDir string, outFile string
 			} else {
 				fmt.Printf("ERROR: %v\n", err)
 			}
-			main.Cards = append(main.Cards, c)
-			if playset {
-				main.Cards = append(main.Cards, c)
-				main.Cards = append(main.Cards, c)
+			for i := 0; i < numberOfCopiesPerCard; i++ {
 				main.Cards = append(main.Cards, c)
 			}
 		}
