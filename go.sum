@@ -1,6 +1,8 @@
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/cognicraft/archive v0.0.0-20191214124929-0216542be23a h1:ZOGC4yali7TZeOCYlxaaLlG81mvLG6B/DmQ1qBtRJsY=
 github.com/cognicraft/archive v0.0.0-20191214124929-0216542be23a/go.mod h1:sPQWHDbO0YwwqIm7z7dI+25Gz5WYCge7UKQFTt2DLXE=
+github.com/cognicraft/archive v0.0.0-20200216123031-33653d1d7a08 h1:2d9p5jarkaOtCASyW6Qt8zdFPe7juFiQvQt2GQr/Bcg=
+github.com/cognicraft/archive v0.0.0-20200216123031-33653d1d7a08/go.mod h1:r5I4ygOeF9LBY5iEDWMMSLksd71bttTfkfx6ch5Dw9Y=
 github.com/cognicraft/sqlutil v0.0.0-20191202125901-c241118d8c1c h1:XkN7GveWRDRETVHBy0WhvegDJWY6PQkOP8T99ZYCvtU=
 github.com/cognicraft/sqlutil v0.0.0-20191202125901-c241118d8c1c/go.mod h1:pI6HcWbv0csaVHST1Y2vZlW0iDxXBTE5TDQVaUzC4gU=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -9,6 +11,8 @@ github.com/jung-kurt/gofpdf v1.16.2 h1:jgbatWHfRlPYiK85qgevsZTHviWXKwB1TTiKdz5Pt
 github.com/jung-kurt/gofpdf v1.16.2/go.mod h1:1hl7y57EsiPAkLbOwzpzqgx1A30nQCk/YmFV8S2vmK0=
 github.com/mattn/go-sqlite3 v2.0.1+incompatible h1:xQ15muvnzGBHpIpdrNi1DA5x0+TcBZzsIDwmw9uTHzw=
 github.com/mattn/go-sqlite3 v2.0.1+incompatible/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
+github.com/mattn/go-sqlite3 v2.0.3+incompatible h1:gXHsfypPkaMZrKbD5209QV9jbUTJKjyR5WD3HYQSd+U=
+github.com/mattn/go-sqlite3 v2.0.3+incompatible/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
 github.com/phpdave11/gofpdi v1.0.7/go.mod h1:vBmVV0Do6hSBHC8uKUQ71JGW+ZGQq74llk/7bXwjDoI=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
