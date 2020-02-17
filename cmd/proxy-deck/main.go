@@ -78,9 +78,9 @@ func main() {
 
 	switch *f {
 	case "text":
-		err = mtg.NewProxyPrinter(scry, deck, opts...).WriteTextProxies(proxyFileName)
+		err = mtg.NewProxyPrinter(scry, deck, opts...).WriteTextProxiesToFile(proxyFileName)
 	default:
-		err = mtg.NewProxyPrinter(scry, deck, opts...).WriteImageProxies(proxyFileName)
+		err = mtg.NewProxyPrinter(scry, deck, opts...).WriteImageProxiesToFile(proxyFileName)
 	}
 	if err != nil {
 		log.Fatal(err)

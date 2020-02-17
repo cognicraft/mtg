@@ -3,6 +3,8 @@ package mtg
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 
 	"github.com/cognicraft/mtg/scryfall"
@@ -69,7 +71,23 @@ type ProxyPrinter struct {
 	numberOfTokens  int
 }
 
-func (p *ProxyPrinter) WriteImageProxies(file string) error {
+func (p *ProxyPrinter) WriteImageProxiesToFile(fileStr string) error {
+	pdfFile, err := os.Create(fileStr)
+	if err != nil {
+		return err
+	}
+	err = p.WriteImageProxies(pdfFile)
+	if err != nil {
+		return err
+	}
+	err = pdfFile.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *ProxyPrinter) WriteImageProxies(w io.Writer) error {
 	pdf := gofpdf.New("L", "mm", "A4", "")
 
 	pdf.SetFont("Arial", "", 10)
@@ -110,11 +128,26 @@ func (p *ProxyPrinter) WriteImageProxies(file string) error {
 			writeSection(s.Cards)
 		}
 	}
-
-	return pdf.OutputFileAndClose(file)
+	return pdf.Output(w)
 }
 
-func (p *ProxyPrinter) WriteTextProxies(file string) error {
+func (p *ProxyPrinter) WriteTextProxiesToFile(fileStr string) error {
+	pdfFile, err := os.Create(fileStr)
+	if err != nil {
+		return err
+	}
+	err = p.WriteTextProxies(pdfFile)
+	if err != nil {
+		return err
+	}
+	err = pdfFile.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *ProxyPrinter) WriteTextProxies(w io.Writer) error {
 	pdf := gofpdf.New("L", "mm", "A4", "")
 
 	pdf.SetFont("Arial", "", 8)
@@ -184,7 +217,7 @@ func (p *ProxyPrinter) WriteTextProxies(file string) error {
 		}
 	}
 
-	return pdf.OutputFileAndClose(file)
+	return pdf.Output(w)
 }
 
 func (p *ProxyPrinter) collectProxyDeck() Deck {

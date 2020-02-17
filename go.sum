@@ -3,6 +3,10 @@ github.com/cognicraft/archive v0.0.0-20191214124929-0216542be23a h1:ZOGC4yali7TZ
 github.com/cognicraft/archive v0.0.0-20191214124929-0216542be23a/go.mod h1:sPQWHDbO0YwwqIm7z7dI+25Gz5WYCge7UKQFTt2DLXE=
 github.com/cognicraft/archive v0.0.0-20200216123031-33653d1d7a08 h1:2d9p5jarkaOtCASyW6Qt8zdFPe7juFiQvQt2GQr/Bcg=
 github.com/cognicraft/archive v0.0.0-20200216123031-33653d1d7a08/go.mod h1:r5I4ygOeF9LBY5iEDWMMSLksd71bttTfkfx6ch5Dw9Y=
+github.com/cognicraft/hyper v0.0.0-20200216181535-b0940252fd1f h1:8soxWIkJvLeZ1itzvvHDD37hDLJT/0AQrLHAMFRJy7c=
+github.com/cognicraft/hyper v0.0.0-20200216181535-b0940252fd1f/go.mod h1:0kLt0pLOSqOLZiFgyyWczlaNSFNiuuMmEKKOnCvIuPE=
+github.com/cognicraft/mux v0.0.0-20200211052233-9821dbf021ca h1:zmYjedRmrP9xo88LybEmqz5kVf3yEv17kkyCBalYPaU=
+github.com/cognicraft/mux v0.0.0-20200211052233-9821dbf021ca/go.mod h1:1XIig/ORziu3dQUOktN4+DyvOiYzSkuHDMuUx2V8jbw=
 github.com/cognicraft/sqlutil v0.0.0-20191202125901-c241118d8c1c h1:XkN7GveWRDRETVHBy0WhvegDJWY6PQkOP8T99ZYCvtU=
 github.com/cognicraft/sqlutil v0.0.0-20191202125901-c241118d8c1c/go.mod h1:pI6HcWbv0csaVHST1Y2vZlW0iDxXBTE5TDQVaUzC4gU=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
