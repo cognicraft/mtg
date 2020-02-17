@@ -77,12 +77,15 @@ func (s *Service) handlePOST(w http.ResponseWriter, r *http.Request) {
 	cmd := hyper.ExtractCommand(r)
 	switch cmd.Action {
 	case "generate-proxies":
+		name := cmd.Arguments.String("name")
 		deckText := cmd.Arguments.String("deck")
 		deck, err := mtg.ParseDeck(strings.NewReader(deckText))
 		if err != nil {
 			hyper.WriteError(w, http.StatusBadRequest, err)
 			return
 		}
+		deck.Name = name
+
 		w.Header().Set(hyper.HeaderContentType, "application/pdf")
 		err = mtg.NewProxyPrinter(s.Scryfall, deck).WriteImageProxies(w)
 		if err != nil {
@@ -133,6 +136,9 @@ body {
 	margin-bottom: .5em;
 }
 
+label {
+	margin-right: .5em;
+}
 textarea {
 	margin: auto;
 	width: 99%;
@@ -157,7 +163,8 @@ const index = `
 		<h1>MTG - Proxy Deck Generator</h1>
 		<form action="/" method="POST">
 			<input type="hidden" name="@action" value="generate-proxies">
-			<textarea name="deck" cols="80" rows="30"></textarea><br/>
+			<label>Name:</label><input type="text" name="name"></input><br/>
+			<label>Deck:</label><textarea name="deck" cols="80" rows="30"></textarea><br/>
 			<input type="submit" value="Generate Proxies" />
 		</form>
 	</div>
