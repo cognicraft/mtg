@@ -175,6 +175,18 @@ input[type=radio] + label{
 	margin-right: 1em;
 }
 
+.buttons {
+	border-top: 1px solid #ccc;
+	padding: .75em;
+	text-align: right;	
+}
+
+input[type=reset] {
+	background: transparent;
+	margin-left: .5em;
+	padding: .5em;
+}
+
 input[type=submit] {
 	padding: .5em;
 	color: #fff;
@@ -184,12 +196,6 @@ input[type=submit] {
 	border-radius: 5px;
 	text-transform: uppercase;
 	box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
-}
-
-.buttons{
-	border-top: 1px solid #ccc;
-	padding: .75em;
-	text-align: right;	
 }
 `
 
@@ -231,6 +237,7 @@ const index = `
 				<input type="text" id="name" name="name" />
 			</fieldset>
 			<div class="buttons">
+				<input type="reset"/>
 				<input type="submit" value="Generate Proxies" />
 			</div>
 		</form>
