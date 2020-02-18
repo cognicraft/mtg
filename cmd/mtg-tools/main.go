@@ -226,7 +226,7 @@ const index = `
 				<input type="number" id="number-of-tokens" name="number-of-tokens" min="0" max="20" value="4" step="1"/>
 			</fieldset>
 			<fieldset>
-				<legend>Do you want to use the <a href="#staples-binder-method">Staples Binder Method</a>?</legend
+				<legend>Enter a deck name, if you want to use the <a href="#staples-binder-method">Staples Binder Method</a>.</legend
 				<label for="name">Name</label>
 				<input type="text" id="name" name="name" />
 			</fieldset>
