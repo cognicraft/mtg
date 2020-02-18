@@ -115,24 +115,40 @@ const css = `
 body {
 	font-family: "Roboto", Helvetica, Arial, sans-serif;
 	font-weight: 100;
-	font-size: 12px;
+	font-size: 13px;
 	color: #777;
-	background: #4CAF50;
+	background: #f7f7f7;
 	margin: 4em;
 }
 
 .card {
-	background: #F9F9F9;
+	background: #fff;
 	width: 75%;
-	padding: 25px;
 	margin: auto;
 	margin-top: 5em;
 	margin-bottom: 5em;
 	border-radius: 10px;
 	box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
+
+.card .header{
+	height: 6em;
+	padding: 1em;
+	border-top-left-radius: 10px;
+	border-top-right-radius:10px;
+	background: #00897B;
+	position: relative;
+	color: #fff;
+}
+
+.card .content {
+	padding: 1em;
+}
+
 .card h1 {
-	margin-bottom: 1em;
+	position: absolute;
+	bottom: .5em;
+	left: 1em;
 }
 
 .card ul {
@@ -194,7 +210,7 @@ input[type=reset] {
 input[type=submit] {
 	padding: .5em;
 	color: #fff;
-	background-color: #26a69a;
+	background-color: #009688;
 	text-align: center;
 	letter-spacing: .5px;
 	border-radius: 5px;
@@ -217,51 +233,60 @@ const index = `
 
 <body translate="no">
 	<div class="card">
-		<h1>MTG - Proxy Deck Generator</h1>
-		<form action="/" method="POST">
-			<input type="hidden" name="@action" value="generate-proxies">
-			<fieldset>
-				<legend>Deck</legend>
-				<textarea name="deck" cols="80" rows="20"></textarea>
-			</fieldset>
-			<fieldset>
-				<legend>Do you need Tokens?</legend>
-				<input type="radio" id="no-tokens" name="tokens" value="none" checked>
-				<label for="no-tokens">No Tokens</label>
-				<input type="radio" id="with-tokens" name="tokens" value="with">
-				<label for="with-tokens">With Tokens</label>
-				<input type="radio" id="only-tokens" name="tokens" value="only">
-				<label for="only-tokens">Only Tokens</label>
-				<label for="number-of-tokens" style="margin-left: 1em;">Number of Tokens:</label>
-				<input type="number" id="number-of-tokens" name="number-of-tokens" min="0" max="20" value="4" step="1"/>
-			</fieldset>
-			<fieldset>
-				<legend>Enter a deck name, if you want to use the <a href="#staples-binder-method">Staples Binder Method</a>.</legend
-				<label for="name">Name</label>
-				<input type="text" id="name" name="name" />
-			</fieldset>
-			<div class="buttons">
-				<input type="reset"/>
-				<input type="submit" value="Generate Proxies" />
-			</div>
-		</form>
+		<div class="header">
+			<h1>Magic: The Gathering - Proxy Deck Generator</h1>
+		</div>
+		<div class="content">
+			<form action="/" method="POST">
+				<input type="hidden" name="@action" value="generate-proxies">
+				<fieldset>
+					<legend>Deck</legend>
+					<textarea name="deck" cols="80" rows="20"></textarea>
+				</fieldset>
+				<fieldset>
+					<legend>Do you need Tokens?</legend>
+					<input type="radio" id="no-tokens" name="tokens" value="none" checked>
+					<label for="no-tokens">No Tokens</label>
+					<input type="radio" id="with-tokens" name="tokens" value="with">
+					<label for="with-tokens">With Tokens</label>
+					<input type="radio" id="only-tokens" name="tokens" value="only">
+					<label for="only-tokens">Only Tokens</label>
+					<label for="number-of-tokens" style="margin-left: 1em;">Number of Tokens:</label>
+					<input type="number" id="number-of-tokens" name="number-of-tokens" min="0" max="20" value="4" step="1"/>
+				</fieldset>
+				<fieldset>
+					<legend>Enter a deck name, if you want to use the <a href="#staples-binder-method">Staples Binder Method</a>.</legend
+					<label for="name">Name</label>
+					<input type="text" id="name" name="name" />
+				</fieldset>
+				<div class="buttons">
+					<input type="reset"/>
+					<input type="submit" value="Generate Proxies" />
+				</div>
+			</form>
+		</div>
 	</div>
+
 	<div class="card">
-		<a id="staples-binder-method">
-		<h1>The Staples Binder Method</h1>
-		<p>The Staples Binder Method can be used to to save some cash while playing multiple decks within a format. With this method you will need at max 4 original copies of any given card in your collection. To reduce the amount of effort this method should only be used for cards that have a value greater than a few dollars.</p>
-		<ul>
-			<li>Put all decks in the same sleeves (brand/color).</li>
-			<li>Keep the sleeved staples in a binder.</li>
-			<li>Proxy print the needed number of any given staple with the decks name as an overlay.</li>
-			<li>Cut out the proxy.</li>
-			<li>Sleve up the proxy together with a basic land.</li>
-			<li>Keep the sleeved proxy with the rest of the cards in the deck.</li>
-			<li>Before the game pull out all proxies and replace them with the original printings from the Stapels Binder.</li>
-			<li>After the game replace all of the staples in your deck with the proxies that where pulled out before the game.</li>
-			<li><em>Tip:</em> The name of the deck is important if you want to always know where the original printing currently is. If you find a proxy within your Staples Binder the name will tell you where your original is located. In case you're trying to replace a proxy from deck A and find a proxy of deck B in your Staples Binder you know that the original is currently located in deck B.</li>
-			<li><em>Tip:</em> In a casual setting and if your playgroup does not mind, you could skip replacing the proxies to save some time and effort. In case you are double sleeving your cards you will not notice a difference in thickness between (proxy + basic land + outer-sleeve) and (inner-sleeve + staple + outer-sleeve).</li>
-		</ul>
+		<div class="header">
+			<a id="staples-binder-method">
+			<h1>The Staples Binder Method</h1>
+		</div>
+		<div class="content">
+			<p>The Staples Binder Method can be used to to save some cash while playing multiple decks within a format. With this method you will need at max 4 original copies of any given card in your collection. To reduce the amount of effort this method should only be used for cards that have a value greater than a few dollars.</p>
+			<ul>
+				<li>Put all decks in the same sleeves (brand/color).</li>
+				<li>Keep the sleeved staples in a binder.</li>
+				<li>Proxy print the needed number of any given staple with the decks name as an overlay.</li>
+				<li>Cut out the proxy.</li>
+				<li>Sleve up the proxy together with a basic land.</li>
+				<li>Keep the sleeved proxy with the rest of the cards in the deck.</li>
+				<li>Before the game pull out all proxies and replace them with the original printings from the Stapels Binder.</li>
+				<li>After the game replace all of the staples in your deck with the proxies that where pulled out before the game.</li>
+				<li><em>Tip:</em> The name of the deck is important if you want to always know where the original printing currently is. If you find a proxy within your Staples Binder the name will tell you where your original is located. In case you're trying to replace a proxy from deck A and find a proxy of deck B in your Staples Binder you know that the original is currently located in deck B.</li>
+				<li><em>Tip:</em> In a casual setting and if your playgroup does not mind, you could skip replacing the proxies to save some time and effort. In case you are double sleeving your cards you will not notice a difference in thickness between (proxy + basic land + outer-sleeve) and (inner-sleeve + staple + outer-sleeve).</li>
+			</ul>
+		</div>
 	</div>
 </body>
 </html>
