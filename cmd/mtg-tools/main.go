@@ -126,8 +126,8 @@ body {
 	width: 75%;
 	padding: 25px;
 	margin: auto;
-	margin-top: 3em;
-	margin-bottom: 3em;
+	margin-top: 5em;
+	margin-bottom: 5em;
 	border-radius: 10px;
 	box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
@@ -151,21 +151,45 @@ fieldset {
 	padding: .75em;
 	margin-top: .5em;
 	margin-bottom: .5em;
-	border: 1px solid green;	
-    border-radius: 5px;	
+	border: none;
+	border-top: 1px solid #ccc;	
+}
+
+input {
+	border: 1px solid #ccc;
 }
 
 textarea {
+	border: 1px solid #ccc;
+	padding: .25em;
 	width: 100%;
 	resize: none;
 }
 
 input[type=text]{
+	padding: .25em;
 	width: 100%;
 }
 
-input[type=radio]+label{
+input[type=radio] + label{
 	margin-right: 1em;
+}
+
+input[type=submit] {
+	padding: .5em;
+	color: #fff;
+	background-color: #26a69a;
+	text-align: center;
+	letter-spacing: .5px;
+	border-radius: 5px;
+	text-transform: uppercase;
+	box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+}
+
+.buttons{
+	border-top: 1px solid #ccc;
+	padding: .75em;
+	text-align: right;	
 }
 `
 
@@ -187,8 +211,8 @@ const index = `
 		<form action="/" method="POST">
 			<input type="hidden" name="@action" value="generate-proxies">
 			<fieldset>
-				<legend>Name</legend>
-				<input type="text" name="name" />
+				<legend>Deck</legend>
+				<textarea name="deck" cols="80" rows="20"></textarea>
 			</fieldset>
 			<fieldset>
 				<legend>Do you need Tokens?</legend>
@@ -202,13 +226,17 @@ const index = `
 				<input type="number" id="number-of-tokens" name="number-of-tokens" min="0" max="20" value="4" step="1"/>
 			</fieldset>
 			<fieldset>
-				<legend>Deck</legend>
-				<textarea name="deck" cols="80" rows="25"></textarea>
+				<legend>Do you want to use the <a href="#staples-binder-method">Staples Binder Method</a>?</legend
+				<label for="name">Name</label>
+				<input type="text" id="name" name="name" />
 			</fieldset>
-			<input type="submit" value="Generate Proxies" />
+			<div class="buttons">
+				<input type="submit" value="Generate Proxies" />
+			</div>
 		</form>
 	</div>
 	<div class="card">
+		<a id="staples-binder-method">
 		<h1>The Staples Binder Method</h1>
 		<p>The Staples Binder Method can be used to to save some cash while playing multiple decks within a format. With this method you will need at max 4 original copies of any given card in your collection. To reduce the amount of effort this method should only be used for cards that have a value greater than a few dollars.</p>
 		<ul>
