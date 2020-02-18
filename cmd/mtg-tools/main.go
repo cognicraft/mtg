@@ -185,6 +185,10 @@ input[type=reset] {
 	background: transparent;
 	margin-left: .5em;
 	padding: .5em;
+	text-align: center;
+	letter-spacing: .5px;
+	border-radius: 5px;
+	text-transform: uppercase;
 }
 
 input[type=submit] {
