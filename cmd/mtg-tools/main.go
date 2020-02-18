@@ -78,6 +78,8 @@ func (s *Service) handlePOST(w http.ResponseWriter, r *http.Request) {
 	switch cmd.Action {
 	case "generate-proxies":
 		name := cmd.Arguments.String("name")
+		tokens := cmd.Arguments.String("tokens")
+		numberOfTokens := cmd.Arguments.Int("number-of-tokens")
 		deckText := cmd.Arguments.String("deck")
 		deck, err := mtg.ParseDeck(strings.NewReader(deckText))
 		if err != nil {
@@ -86,8 +88,17 @@ func (s *Service) handlePOST(w http.ResponseWriter, r *http.Request) {
 		}
 		deck.Name = name
 
+		var opts []mtg.PrinterOption
+		opts = append(opts, mtg.NumberOfTokens(numberOfTokens))
+		switch tokens {
+		case "only":
+			opts = append(opts, mtg.PrintOnlyTokens())
+		case "with":
+			opts = append(opts, mtg.PrintTokens())
+		}
+
 		w.Header().Set(hyper.HeaderContentType, "application/pdf")
-		err = mtg.NewProxyPrinter(s.Scryfall, deck).WriteImageProxies(w)
+		err = mtg.NewProxyPrinter(s.Scryfall, deck, opts...).WriteImageProxies(w)
 		if err != nil {
 			log.Printf("%#v", err)
 		}
@@ -136,13 +147,25 @@ body {
 	margin-bottom: .5em;
 }
 
-label {
-	margin-right: .5em;
+fieldset {
+	padding: .75em;
+	margin-top: .5em;
+	margin-bottom: .5em;
+	border: 1px solid green;	
+    border-radius: 5px;	
 }
+
 textarea {
-	margin: auto;
-	width: 99%;
+	width: 100%;
 	resize: none;
+}
+
+input[type=text]{
+	width: 100%;
+}
+
+input[type=radio]+label{
+	margin-right: 1em;
 }
 `
 
@@ -163,8 +186,25 @@ const index = `
 		<h1>MTG - Proxy Deck Generator</h1>
 		<form action="/" method="POST">
 			<input type="hidden" name="@action" value="generate-proxies">
-			<label>Name:</label><input type="text" name="name"></input><br/>
-			<label>Deck:</label><textarea name="deck" cols="80" rows="30"></textarea><br/>
+			<fieldset>
+				<legend>Name</legend>
+				<input type="text" name="name" />
+			</fieldset>
+			<fieldset>
+				<legend>Do you need Tokens?</legend>
+				<input type="radio" id="no-tokens" name="tokens" value="none" checked>
+				<label for="no-tokens">No Tokens</label>
+				<input type="radio" id="with-tokens" name="tokens" value="with">
+				<label for="with-tokens">With Tokens</label>
+				<input type="radio" id="only-tokens" name="tokens" value="only">
+				<label for="only-tokens">Only Tokens</label>
+				<label for="number-of-tokens" style="margin-left: 1em;">Number of Tokens:</label>
+				<input type="number" id="number-of-tokens" name="number-of-tokens" min="0" max="20" value="4" step="1"/>
+			</fieldset>
+			<fieldset>
+				<legend>Deck</legend>
+				<textarea name="deck" cols="80" rows="25"></textarea>
+			</fieldset>
 			<input type="submit" value="Generate Proxies" />
 		</form>
 	</div>
