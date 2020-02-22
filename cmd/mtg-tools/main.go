@@ -83,7 +83,7 @@ func (s *Service) handlePOST(w http.ResponseWriter, r *http.Request) {
 		deckText := cmd.Arguments.String("deck")
 		deck, err := mtg.ParseDeck(strings.NewReader(deckText))
 		if err != nil {
-			hyper.WriteError(w, http.StatusBadRequest, err)
+			hyper.Write(w, http.StatusBadRequest, hyper.ErrorItem(err))
 			return
 		}
 		deck.Name = name
