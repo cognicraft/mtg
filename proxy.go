@@ -47,9 +47,17 @@ func NumberOfTokens(n int) PrinterOption {
 	}
 }
 
+func Language(lang scryfall.Lang) PrinterOption {
+	return func(p *ProxyPrinter) error {
+		p.lang = lang
+		return nil
+	}
+}
+
 func NewProxyPrinter(client *scryfall.Client, deck Deck, opts ...PrinterOption) *ProxyPrinter {
 	p := &ProxyPrinter{
 		client:          client,
+		lang:            scryfall.LangEnglish,
 		deck:            deck,
 		printFrontFaces: true,
 		printBackFaces:  true,
@@ -64,6 +72,7 @@ func NewProxyPrinter(client *scryfall.Client, deck Deck, opts ...PrinterOption) 
 
 type ProxyPrinter struct {
 	client          *scryfall.Client
+	lang            scryfall.Lang
 	deck            Deck
 	printFrontFaces bool
 	printBackFaces  bool
@@ -269,6 +278,12 @@ func (p *ProxyPrinter) collectProxyDeck() Deck {
 	cards := p.deck.Cards()
 	for _, card := range cards {
 		sc := p.client.CardByName(card.Name)
+		if sc == nil {
+			continue
+		}
+		if p.lang != scryfall.LangEnglish {
+			sc = p.client.CardBySetAndNumber(sc.Set, sc.CollectorNumber, p.lang)
+		}
 		if sc == nil {
 			continue
 		}

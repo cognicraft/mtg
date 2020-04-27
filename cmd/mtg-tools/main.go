@@ -77,19 +77,25 @@ func (s *Service) handlePOST(w http.ResponseWriter, r *http.Request) {
 	cmd := hyper.ExtractCommand(r)
 	switch cmd.Action {
 	case "generate-proxies":
+		lang := cmd.Arguments.String("lang")
+		if lang == "" {
+			lang = "en"
+		}
 		name := cmd.Arguments.String("name")
 		tokens := cmd.Arguments.String("tokens")
 		numberOfTokens := cmd.Arguments.Int("number-of-tokens")
 		deckText := cmd.Arguments.String("deck")
 		deck, err := mtg.ParseDeck(strings.NewReader(deckText))
 		if err != nil {
-			hyper.Write(w, http.StatusBadRequest, hyper.ErrorItem(err))
+			hyper.Write(w, http.StatusBadRequest, hyper.Item{})
 			return
 		}
 		deck.Name = name
 
-		var opts []mtg.PrinterOption
-		opts = append(opts, mtg.NumberOfTokens(numberOfTokens))
+		opts := []mtg.PrinterOption{
+			mtg.Language(scryfall.Lang(lang)),
+			mtg.NumberOfTokens(numberOfTokens),
+		}
 		switch tokens {
 		case "only":
 			opts = append(opts, mtg.PrintOnlyTokens())
@@ -242,6 +248,13 @@ const index = `
 				<fieldset>
 					<legend>Deck</legend>
 					<textarea name="deck" cols="80" rows="20"></textarea>
+				</fieldset>
+				<fieldset>
+					<legend>Language</legend>
+					<input type="radio" id="lang-en" name="lang" value="en" checked>
+					<label for="lang-en">English</label>
+					<input type="radio" id="lang-de" name="lang" value="de">
+					<label for="lang-de">German</label>
 				</fieldset>
 				<fieldset>
 					<legend>Do you need Tokens?</legend>

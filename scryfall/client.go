@@ -19,7 +19,6 @@ type ClientOption func(*Client) error
 func New(opts ...ClientOption) (*Client, error) {
 	c := &Client{
 		baseURL:    "https://api.scryfall.com",
-		lang:       LangEnglish,
 		delay:      100 * time.Millisecond,
 		httpClient: &http.Client{},
 	}
@@ -48,13 +47,6 @@ func Cache(cache *archive.Archive) ClientOption {
 	}
 }
 
-func Language(l Lang) ClientOption {
-	return func(c *Client) error {
-		c.lang = l
-		return nil
-	}
-}
-
 func Debug() ClientOption {
 	return func(c *Client) error {
 		c.logf = func(format string, args ...interface{}) {
@@ -67,7 +59,6 @@ func Debug() ClientOption {
 type Client struct {
 	baseURL    string
 	cache      *archive.Archive
-	lang       Lang
 	logf       func(string, ...interface{})
 	delay      time.Duration
 	lastAccess time.Time
@@ -75,9 +66,30 @@ type Client struct {
 }
 
 func (c *Client) CardByName(name string) *Card {
-	c.logf("[DEBUG] Card(%q)", name)
+	c.logf("[DEBUG] CardByName(%q)", name)
 
 	url := c.urlCardByName(name)
+
+	card := Card{}
+	if err := archive.LoadJSON(c.cache, url, &card); err == nil {
+		c.logf("[DEBUG]   retrieved from cache")
+		return &card
+	}
+
+	err := c.doGetJSON(url, &card)
+	if err != nil {
+		c.logf("[ERROR]   %v", err)
+		return nil
+	}
+	c.cache.Store(archive.GenericJSON(url, card))
+	c.logf("[DEBUG]   retrieved from scryfall")
+	return &card
+}
+
+func (c *Client) CardBySetAndNumber(set string, number string, lang Lang) *Card {
+	c.logf("[DEBUG] CardBySetAndNumber(%q, %q)", set, number)
+
+	url := c.urlCardBySetAndNumber(set, number, lang)
 
 	card := Card{}
 	if err := archive.LoadJSON(c.cache, url, &card); err == nil {
@@ -176,6 +188,10 @@ func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 
 func (s *Client) urlCardByName(name string) string {
 	return fmt.Sprintf("%s/cards/named?fuzzy=%s", s.baseURL, url.QueryEscape(name))
+}
+
+func (s *Client) urlCardBySetAndNumber(set string, number string, lang Lang) string {
+	return fmt.Sprintf("%s/cards/%s/%s/%s", s.baseURL, set, number, lang)
 }
 
 func (s *Client) urlCardImageByName(name string) string {

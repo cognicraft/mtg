@@ -1,12 +1,14 @@
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/cognicraft/archive v0.1.0 h1:gimZ6sIYPkQZc1FukSh4OUmgkzZfB1PXkEAY8kkvxGk=
 github.com/cognicraft/archive v0.1.0/go.mod h1:GtrzUgr7QYMtwX6e2VKBX5UsbqP8B+frUpTJI0DGqCE=
-github.com/cognicraft/hyper v0.1.1 h1:/+S2Kg+Vq6HOD5HYLE39pX8haCGgNW3orY34BJvX7ZI=
-github.com/cognicraft/hyper v0.1.1/go.mod h1:0kLt0pLOSqOLZiFgyyWczlaNSFNiuuMmEKKOnCvIuPE=
+github.com/cognicraft/hyper v0.1.5 h1:nmQK0yBdvZjo+g0DkrT+wSgT0BIJ6dE+sCUYzWlEGd4=
+github.com/cognicraft/hyper v0.1.5/go.mod h1:rdypOsSfNqvVIlUj2H5ETGdQwM8MuPaL1bZd+eu1l50=
 github.com/cognicraft/mux v0.1.0 h1:8GpxFm5vWkADMEdVRz9Q6OcES55TwBmqohjOqqT09D0=
 github.com/cognicraft/mux v0.1.0/go.mod h1:1XIig/ORziu3dQUOktN4+DyvOiYzSkuHDMuUx2V8jbw=
 github.com/cognicraft/sqlutil v0.1.0 h1:5/ph7A6VXrlPiOSbuprA9qWel61Tx59MfwmC+JN97p0=
 github.com/cognicraft/sqlutil v0.1.0/go.mod h1:pI6HcWbv0csaVHST1Y2vZlW0iDxXBTE5TDQVaUzC4gU=
+github.com/cognicraft/uri v0.1.0 h1:jEcf8U8K3go/KgT6UEzpmg2g2F6fzVdgkVNNWCC//E4=
+github.com/cognicraft/uri v0.1.0/go.mod h1:9XFZ16Bom4ibGYnBNCWjL5szm0V3oFj35Mubk+LxpTo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/jung-kurt/gofpdf v1.0.0/go.mod h1:7Id9E/uU8ce6rXgefFLlgrJj/GYY22cpxn+r32jIOes=
 github.com/jung-kurt/gofpdf v1.16.2 h1:jgbatWHfRlPYiK85qgevsZTHviWXKwB1TTiKdz5PtRc=
