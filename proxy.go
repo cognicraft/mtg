@@ -163,7 +163,7 @@ func (p *ProxyPrinter) WriteTextProxies(w io.Writer) error {
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFillColor(255, 255, 255)
 
-	rep := strings.NewReplacer("−", "-")
+	rep := strings.NewReplacer("−", "-", "\n", "\n\n")
 	tr := pdf.UnicodeTranslatorFromDescriptor("")
 
 	writeSection := func(cards []Card) {
@@ -178,7 +178,10 @@ func (p *ProxyPrinter) WriteTextProxies(w io.Writer) error {
 			pdf.RoundedRect(x+2, y+2, cardWidth-2*2, cardHeight-2*2, 3, "1234", "D")
 
 			pdf.MoveTo(x+2, y+2)
+			pdf.SetFont("Arial", "B", 10)
 			pdf.CellFormat(cardWidth-2*2, 6, tr(card.Name), "", 0, "LM", false, 0, "")
+			pdf.SetFont("Arial", "", 8)
+
 			if card.ManaCost != "" {
 				pdf.MoveTo(x+2, y+2)
 				pdf.CellFormat(cardWidth-2*2, 6, tr(card.ManaCost), "", 0, "RM", false, 0, "")
@@ -186,16 +189,10 @@ func (p *ProxyPrinter) WriteTextProxies(w io.Writer) error {
 
 			pdf.Line(x+2, y+2+6, x+cardWidth-2, y+2+6)
 
-			imgHeight := 15.0
-
-			pdf.Line(x+2, y+2+6, x+cardWidth-2, y+2+6+imgHeight)
-			pdf.Line(x+2, y+2+6+imgHeight, x+cardWidth-2, y+2+6)
-			pdf.Line(x+2, y+2+6+imgHeight, x+cardWidth-2, y+2+6+imgHeight)
-			pdf.MoveTo(x+2, y+2+6+imgHeight)
+			pdf.MoveTo(x+2, y+2+6)
 			pdf.CellFormat(cardWidth-2*2, 6, tr(card.TypeLine), "", 0, "LM", false, 0, "")
-			pdf.Line(x+2, y+2+6+imgHeight+6, x+cardWidth-2, y+2+6+imgHeight+6)
 
-			pdf.MoveTo(x+2, y+2+6+imgHeight+6+1)
+			pdf.MoveTo(x+2, y+2+6+6+1)
 			pdf.MultiCell(cardWidth-2*2, 3.8, tr(rep.Replace(card.OracleText)), "", "LT", false)
 
 			pdf.Line(x+2, y+cardHeight-6-2, x+cardWidth-2, y+cardHeight-6-2)
